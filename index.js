@@ -54,7 +54,7 @@ async function getAsset(event, routesManifest) {
   }
 }
 
-export function getEventHandler(routesManifest) {
+function getEventHandler(routesManifest) {
   return (event) => {
     event.respondWith(getAsset(event, routesManifest));
   };
