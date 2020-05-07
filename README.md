@@ -2,7 +2,7 @@ next-cloudflare
 ==================================
 Utilities for hosting static Next.js site on Cloudflare Workers Sites.
 
-**NOTE** This only works with static Next.js sites. It does **not** support server-side rendering or API routes. See zeit/next.js#11326
+**NOTE:** This library works with static Next.js sites. It does **not** support server-side rendering or API routes. See [zeit/next.js#11326](https://github.com/zeit/next.js/issues/11326)
 
 ## Installation
 ```sh
