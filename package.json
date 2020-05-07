@@ -4,7 +4,7 @@
   "description": "Utilities for hosting static Next.js site on Cloudflare Workers Sites",
   "main": "index.js",
   "scripts": {
-    "test": "eslint ."
+    "test": "eslint --ignore-path .gitignore ."
   },
   "license": "LGPL-3.0-or-later",
   "dependencies": {
