@@ -3,9 +3,12 @@ const { getAssetFromKV } = require('@cloudflare/kv-asset-handler');
 async function getNotFoundAsset(event) {
   const url = new URL(event.request.url);
 
+  const notFoundUrl = new URL('/404.html', url.origin);
   const notFoundResponse = await getAssetFromKV(event, {
-    mapRequestToAsset: (req) => new Request((new URL('/404.html', url.origin)).toString(), req),
+    mapRequestToAsset: (req) => new Request(notFoundUrl.toString(), req),
   });
+
+  notFoundResponse.headers.set('Content-Location', notFoundUrl.toString());
 
   return new Response(notFoundResponse.body, { ...notFoundResponse, status: 404 });
 }
@@ -24,7 +27,9 @@ async function getAsset(event, routesManifest) {
   }
 
   try {
-    return await getAssetFromKV(event, options);
+    const asset = await getAssetFromKV(event, options);
+    asset.headers.set('Content-Location', url.toString());
+    return asset;
   } catch (e) {
     if (!routesManifest || !Array.isArray(routesManifest.dynamicRoutes)) {
       throw e;
@@ -34,9 +39,12 @@ async function getAsset(event, routesManifest) {
 
     if (match) {
       try {
-        return await getAssetFromKV(event, {
-          mapRequestToAsset: (req) => new Request((new URL(`${match.page}.html`, url.origin)).toString(), req),
+        const matchUrl = new URL(`${match.page}.html`, url.origin);
+        const asset = await getAssetFromKV(event, {
+          mapRequestToAsset: (req) => new Request(matchUrl.toString(), req),
         });
+        asset.headers.set('Content-Location', matchUrl.toString());
+        return asset;
       } catch (error) {
         if (!routesManifest.pages404) {
           throw error;
