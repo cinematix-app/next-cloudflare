@@ -4,13 +4,13 @@ async function getNotFoundAsset(event) {
   const url = new URL(event.request.url);
 
   const notFoundUrl = new URL('/404.html', url.origin);
-  const notFoundResponse = await getAssetFromKV(event, {
+  const asset = await getAssetFromKV(event, {
     mapRequestToAsset: (req) => new Request(notFoundUrl.toString(), req),
   });
 
-  notFoundResponse.headers.set('Content-Location', notFoundUrl.toString());
+  asset.headers.set('Content-Location', notFoundUrl.toString());
 
-  return new Response(notFoundResponse.body, { ...notFoundResponse, status: 404 });
+  return new Response(asset.body, { ...asset, status: 404 });
 }
 
 async function getAsset(event, routesManifest) {
@@ -27,9 +27,7 @@ async function getAsset(event, routesManifest) {
   }
 
   try {
-    const asset = await getAssetFromKV(event, options);
-    asset.headers.set('Content-Location', url.toString());
-    return asset;
+    return await getAssetFromKV(event, options);
   } catch (e) {
     if (!routesManifest || !Array.isArray(routesManifest.dynamicRoutes)) {
       throw e;
