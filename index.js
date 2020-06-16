@@ -17,14 +17,33 @@ async function getAsset(event, routesManifest) {
   const url = new URL(event.request.url);
   const options = {};
 
+  const { pathname } = url;
+
   // If this is in the /_next/ folder than it can effectively be
   // cached forever since the next version will have new filenames.
-  if (url.pathname.match(/^\/_next\/.*$/)) {
+  if (pathname.match(/^\/_next\/.*$/)) {
     options.cacheControl = {
       edgeTTL: 31536000, // 1 year
       browserTTL: 31556952, // 1 year
     };
   }
+
+  // If the pathname does not end with '/' and there is not an extension, then add the html
+  // extension to the path.
+  if (!pathname.endsWith('/')) {
+    const filename = pathname.split('/').pop();
+    // @see https://stackoverflow.com/a/12900504
+    // eslint-disable-next-line no-bitwise
+    const extension = filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
+    if (extension !== '') {
+      options.mapRequestToAsset = (req) => {
+        const u = new URL(req.url);
+        u.pathname += '.html';
+        return new Request(u, req);
+      };
+    }
+  }
+
 
   try {
     return await getAssetFromKV(event, options);
