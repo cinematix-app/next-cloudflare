@@ -35,7 +35,7 @@ async function getAsset(event, routesManifest) {
     // @see https://stackoverflow.com/a/12900504
     // eslint-disable-next-line no-bitwise
     const extension = filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
-    if (extension !== '') {
+    if (extension === '') {
       options.mapRequestToAsset = (req) => {
         const u = new URL(req.url);
         u.pathname += '.html';
